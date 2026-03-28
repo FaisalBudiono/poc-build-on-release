@@ -35,22 +35,15 @@ jobs:
             ${{ secrets.CRED_SOMETHING_JSON }}
           EOF
 
-      - name: Print Credentials file
-        run: |
-          cat internal/cred/data/something.json
-
-      - run: |
-          cat <<EOF > internal/cred/data/hauce.txt
-            ini percobaan lainnya
-            hohoho
-          EOF
-
-      - run: cat internal/cred/data/hauce.txt
-
       - name: Building
         run: |
           CGO_ENABLED=0 go build -o ./bin/app-${{ steps.meta.outputs.tags }} ./cmd/app/main.go
           GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o ./bin/app-${{ steps.meta.outputs.tags }}.exe ./cmd/app/main.go
+
+      - name: Change file permissions
+        run: |
+          chmod +x ./bin/app-${{ steps.meta.outputs.tags }}
+          chmod +x ./bin/app-${{ steps.meta.outputs.tags }}.exe
 
       - name: Upload Release artifacts
         uses: softprops/action-gh-release@v2
