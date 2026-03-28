@@ -31,19 +31,19 @@ jobs:
 
       - name: Making Credentials file from Secrets
         run: |
-          cat <<EOF 
+          cat <<EOF > internal/cred/data/something.json
             ${{ secrets.CRED_SOMETHING_JSON }}
-          EOF > internal/cred/data/something.json
+          EOF
 
       - name: Print Credentials file
         run: |
           cat internal/cred/data/something.json
 
       - run: |
-          cat <<EOF
+          cat <<EOF > internal/cred/data/hauce.txt
             ini percobaan lainnya
             hohoho
-          EOF > internal/cred/data/hauce.txt
+          EOF
 
       - run: cat internal/cred/data/hauce.txt
 
