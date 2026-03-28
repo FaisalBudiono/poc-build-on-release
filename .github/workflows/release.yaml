@@ -1,0 +1,50 @@
+name: Make a release binary
+
+on:
+  push:
+    tags:
+      - v*
+      - "!v*-rc"
+
+jobs:
+  build:
+    name: Making binary
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          # Version or version range of Go to use
+          go-version: "1.26"
+
+      - name: Creating Docker Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern=v{{version}}
+
+      - name: Making Credentials file from Secrets
+        run: |
+          cat <<EOF 
+            ${{ secrets.CRED_SOMETHING_JSON }}
+          EOF > internal/cred/data/something.json
+
+      - name: Building
+        run: |
+          CGO_ENABLED=0 go build -o ./bin/app-${{ steps.meta.outputs.tags }} ./cmd/app/main.go
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o ./bin/app-${{ steps.meta.outputs.tags }}.exe ./cmd/app/main.go
+
+      - name: Upload Release artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tags }}
+          files: |
+            bin/app-${{ steps.meta.outputs.tags }}
+            bin/app-${{ steps.meta.outputs.tags }}.exe
