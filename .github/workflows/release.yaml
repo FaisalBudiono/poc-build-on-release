@@ -18,7 +18,6 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          # Version or version range of Go to use
           go-version: "1.26"
 
       - name: Creating Docker Meta
@@ -35,6 +34,18 @@ jobs:
           cat <<EOF 
             ${{ secrets.CRED_SOMETHING_JSON }}
           EOF > internal/cred/data/something.json
+
+      - name: Print Credentials file
+        run: |
+          cat internal/cred/data/something.json
+
+      - run: |
+          cat <<EOF
+            ini percobaan lainnya
+            hohoho
+          EOF > internal/cred/data/hauce.txt
+
+      - run: cat internal/cred/data/hauce.txt
 
       - name: Building
         run: |
